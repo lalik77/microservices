@@ -1,0 +1,6 @@
+- Customer service has been created
+- docker-compose file has been created
+- If you have ultimate edition , you can run from IntelliJ Idea
+- Otherwise run docker compose threw the terminal  and make sure you are within the lalik-services folder -> ' docker compose up -d '
+- On Browser -> http://localhost:5050 and set the master password
+- Now we have to add new server ..... set username and password (lalik )
