@@ -16,12 +16,12 @@ public class FraudController {
     private final FraudCheckService fraudCheckService;
 
     @GetMapping(path = "{customerId}")
-    public FraudCheskResponse isFraudster(@PathVariable("customerId")Integer customerID){
+    public FraudCheckResponse isFraudster(@PathVariable("customerId")Integer customerID){
 
         boolean isFraudulenttCustomer = fraudCheckService.isFraudulentCustomer(customerID);
         log.info("fraud check request for customer {}", customerID);
 
-        return new FraudCheskResponse(isFraudulenttCustomer);
+        return new FraudCheckResponse(isFraudulenttCustomer);
 
 
     }
