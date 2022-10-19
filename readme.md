@@ -1,3 +1,1 @@
-- Spring Cloud
-- Eureka Server Eureka Client	- Eureka Server Eureka Client
-- Load Balanced
+- Replace RestTemplate by OpenFeign
