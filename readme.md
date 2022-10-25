@@ -1,24 +1,11 @@
-- Add dependency 'spring-cloud-starter-sleuth' to customer, eureka-server, fraud, notification 
+- Add new module 'apigw' 
+- Bootstrap: Add couples of dependencies  
 
-![](img/sleuth.png)
+![](img/api-gateway-pom-dependencies.png)
+- Bootstrap: Main App
 
-- Zipkin container 
-![](img/docker-compose-zipkin.png)
-![](img/zipkin-container.png)
+- ![](img/main-app.png)
 
-- docker-zipkin-logs
-![](img/docker-zipkin-logs.png)
-![](img/zipkin-ui.png)
+- Bootstrap: application yaml file
 
-- Add 'spring-cloud-sleuth-zipkin' dependency to customer, eureka-server, fraud and notification modules
-If spring-cloud-sleuth-zipkin is available then the app will generate and report Zipkin-compatible traces via HTTP.
-![](img/spring-cloud-sleuth-zipkin.png)
-
-- Configure the location of the service using spring.zipkin.baseUrl in application.yml file for each microservice
-
-![](img/zipkin-base-url.png)
-
-- After run each microservice and sending request in postman 
-![](img/postman-request.png)
-we have zipkin in action with total of spans and with trace id etc
-![](img/zipkin-in-action.png)
+![](img/gatewaay-application-yml.png)
