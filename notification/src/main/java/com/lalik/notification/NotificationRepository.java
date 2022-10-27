@@ -1,4 +1,4 @@
-package com.lalik;
+package com.lalik.notification;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

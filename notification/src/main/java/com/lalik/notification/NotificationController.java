@@ -1,4 +1,4 @@
-package com.lalik;
+package com.lalik.notification;
 
 import com.lalik.clients.notification.NotificationRequest;
 import lombok.AllArgsConstructor;

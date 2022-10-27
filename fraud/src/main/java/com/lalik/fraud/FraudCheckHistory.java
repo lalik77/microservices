@@ -1,4 +1,4 @@
-package com.lalik;
+package com.lalik.fraud;
 
 
 import lombok.AllArgsConstructor;

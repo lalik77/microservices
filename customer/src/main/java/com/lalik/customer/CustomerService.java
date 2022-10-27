@@ -1,8 +1,8 @@
 package com.lalik.customer;
 
+import com.lalik.amqp.RabbitMQMessageProducer;
 import com.lalik.clients.fraud.FraudCheckResponse;
 import com.lalik.clients.fraud.FraudClient;
-import com.lalik.clients.notification.NotificationClient;
 import com.lalik.clients.notification.NotificationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final FraudClient fraudClient;
-    private final NotificationClient notificationClient;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public void registerCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
 
@@ -34,12 +34,13 @@ public class CustomerService {
         }
         customerRepository.save(customer);
 
-        // todo : send notification
+        final NotificationRequest notificationRequest = new NotificationRequest(customer.getId(),
+                customer.getFirstName(),
+                String.format("Hi %s, welcome to lalik-services...", customer.getFirstName()));
 
-        notificationClient.sendNotification(
-                new NotificationRequest(customer.getId(),
-                        customer.getFirstName(),
-                        String.format("Hi %s, welcome to lalik-services...", customer.getFirstName()))
+        rabbitMQMessageProducer.publish(notificationRequest,
+                "internal.exchange",
+                "internal.notification.routing-key"
         );
     }
 }
