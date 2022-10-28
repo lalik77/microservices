@@ -1,78 +1,89 @@
-- RabbitMQ conatainer : using docker we will edit the docker compose file
-![](img/rabbit-mq-docker-compose.png)
-![](img/pulling-container-1.png)
-![](img/pulling-container-2.png)
-![](img/docker-ps.png)
-![](img/rabbitmq-management-1.png)
-![](img/rabbitmq-management-2.png)
+- Apache Maven Compiler Plugin
+![](img/apache-maven-compiler-plugin.png)
+
+Within pom.xml (the main pom) we have the build section
+and within build section we have 'pluginManagement' and 'plugins'.
+So by default all sub-modules will have this plugin 
+![](img/main-pom-1.png)
+So let's focus on Maven Compiler Plugin
+Changing from 16-version to 17-version</br>
+Also we specify the version
+![](img/main-pom-2.png)
+
+So open up 'amqp' module then open up within pom.xml and by default
+like others sub-modules will have this 'maven-compiler-plugin'</br>
+And we don't need  these properties -> 
+
+![](img/amqp-pom.png)
+
+What we need is to specify the packaging for every sub-module
+![](img/amqp-pom-jar.png)
+Let's do the same with other sub-modules  'clients'
+![](img/clients-pom-1.png)
+![](img/clients-pom-2.png)
+
+So now if you want to generate the jar for these two modules, open the maven tab
+![](img/clients-package-mvn.png)
+
+Next we will take all of our microservices and package them using
+the spring boot maven plugin
 
 
-- AMQPTemplate and JacksonConverter :
+- Spring Boot Maven Plugin
+![](img/spring-boot-maven-plugin.png)
 
- 1 . Create new module amqp
+In main pom.xml we know about this plugin which is included in every single module
+![](img/maven-compiler-plugin.png)
+We might be wondering if we package up the springboot application with this 
+plugin then we might be able to run the application.So Spring Boot gives us the Spring Boot 
+Maven Plugin 
+![](img/spring-boot-maven-plugin-2.png)
+Packaging Executable Archives
+![](img/packaging-exe-archive-1.png)
+So if we open the main pom, we can see we are defining the plugin ourselves.
+What we would like to do is just to include the face 
+![](img/pom-executions-repackage.png)
+The goal is repackage : so basically after packaging the application using 
+'maven-compiler-plugin' then it goes, and then it repackages so that it can basically run the Spring Boot
+Application.Without this we won't be able to run the applications.
+</br>
+Let's open our microservices and let's start with api gateway microservice 'apigw'
+![](img/api-gw-pom.png)
+We do the same thing in each pom.xml file for every microservice
 
- 2 . Create a config class 'RabbitMQConfig'
+- Installing Root and Individual Modules with maven 
 
- 3 . AMQPTemplate and JacksonConverter
+If we open up for example maven and try to compile customer , it gives me an error 
+![](img/mvn-cusromer-compile-error.png)
+The reason why this is not finding them, because we did not run yet maven install.
+Explanation : if we go to the folder .m2/repository/com -> currently we don't see anything wit lalik-services 
+![](img/terminal-m2-1.png)
+<br>
+![](img/terminal-m2-2.png)
 
-![](img/Config.png)
+This is why in IntelliJ , it says that customer cannot run because the amqp:jar and clients:jar  
+are missing.
 
+whatever you want to start a new project, basically you open the root project then lifecycle and 
+we preform  clean first  and install.
+![](img/mvn-root-clean.png)
+</br>
+![](img/mvn-root-install.png)
+So now if we go back to the terminal we have in 'com' folder 'lalik' folder and inside we have our services.
+![](img/terminal-m2-lalik-srvices-1.png)
+![](img/terminal-m2-lalik-srvices-2.png)
+Let see inside lalik/amqp and we have 1.0-SNAPSHOT
+![](img/terminal-m2-lalik-srvices-3.png)
 
+So whatever we run the 'install'  it actually also packaging into 'jar'
+Where is this 'jar' ? 
+![](img/packaged-modules.png)
 
-- SimpleRabbitListener : After we have configured the rabbit template that allows 
-us to send messages, now in order for app to consume messages 
-from the queues , we have to set up the listener (SimpleRabbitListener)
-This is the setup required for us to send and receive messages from queues.
-Obviously this is not enough because we haven't set up the exchange nor the queues.
-We didn't actually bind the exchange to  particular queue.
-![](img/SimpleRabbitListenerContainerFactory.png)
+Let's run our microservices.There is 2 ways to run our microservices via terminal . 
+First is using the spring boot maven plugin
+![](img/spring-boot-mavn-plug-run.png)
 
-- We will bind the exchange to queue. Adding those dependencies 
-to 'customer' and 'notification' microservices. 
-![](img/dependencies-customer-notification.png)
-Add to application yaml file in 'notification' module  
-![](img/app-yml-rabbitmq.png)
-Add config class 'NotificationConfig' in 'notification' module  
-![](img/NotificationConfig.png)
-
-- Topic Exchange , Queue and binding together
-![](img/topic-exchange-binding-queue.png)     
-
-- Message producer : in 'amqp' module we have to create a new class as component 'RabbitMQMessageProducer'
-![](img/mesage-producer.png)
-- Publishing messages: within 'notification' module in main class
-we will bring in the 'RabbitMQMessageProducer' from 'amqp' module to test how it works and edit application yml
-file to configure port connection rabbitmq: addresses: localhost:5672 (number like it's configured in docker)
-![](img/notification-app.png)
-
-![](img/app-yml-notification.png)
-
-After running 'eureka-server' and 'notification' we will see in action
-the queue in the rabbitMQ UI (Video) 
-
-[![Watch the video](https://img.youtube.com/vi/Yat4ClMGqHA/maxresdefault.jpg)](https://youtu.be/Yat4ClMGqHA)
-
-
-- Customer microservice publishing message to queue :
-Edit application yml file in customer microservice to configure 
-port for rabbit mq ( localhost:5672 (number like it's configured in docker) )
-![](img/customer-app-yml-rabbit-port.png)
-
-Edit customer main app 
-![](img/customer-main-app.png)
-
-Edit 'CustomerService' class
-![](img/customer-service.png)
-
-After running all microservices and sending request from postman (Video)
-[![Watch the video](https://img.youtube.com/vi/0-TWug7JECU/maxresdefault.jpg)](https://youtu.be/0-TWug7JECU)
-
-- @RabbitListener
-In notification module let create new module 'rabbitmq' and new class as component 'NotificationConsumer' 
-![](img/notification-consumer.png)
-
-We have from previous postman request a message in queue pending.
-![](img/rabbit-mq-in-queue-1.png)
-
-After re-run notification service the message was picked from the queue 
-![](img/rabbit-mq-message-picked.png)
+And the second is using  the traditional 'java -jar'
+![](img/run-cmd-java-jar-eureka.png)
+![](img/run-cmd-java-jar-eureka-2.png)
+So like this we  can run all the microservices via terminal.
