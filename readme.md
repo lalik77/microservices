@@ -1,99 +1,66 @@
+# 1 - Disabling Eureka 
+Kubernetes offers service discovery for free , we have one less service to manage.
+Disabling Eureka in customer , fraud and notification services
+![](img/eureka-enable-false.png)
 
-Before begin - we have to watch XIII - Kubernetes AKA k8s videos 
-- running KubeCluster Locally - video 5 - minikube ...
-- in this course we will use minikube
-- Installation : Docker + Minikube<br><br>
-Video 6 - Minikube installation
-  ![](img/minikube-installation.png)
-  ![](img/minikube-installation-2.png)
-  ![](img/minikube-installation-3.png)
-[link](https://minikube.sigs.k8s.io/docs/start/)
-- Preferences before change it to 6 gb
+# 2 - Refactor Feign Clients
+![](img/clients-default-kube.png)
+![](img/notif-url.png)
+![](img/fraud-url.png)
 
-- if we say minikube start --help
-  ![](img/minikube-start-help-memory-1.png)
-  ![](img/docker-preferences-bydefault.png)
-  ![](img/minikube-start-help-memory-1.png)
-- we say minikube start --memory=4g
-  ![](img/minikube-start-mwmory-4g.png)
-  ![](img/minikube-start-memory-4g-finish-intsllation.png)
-  ![](img/minikube-ip.png)
-<br> 
-Video 7 - Installing kubctl
-![](img/install-kubectl-1.png)
-![](img/install-kubectl-2.png)
-![](img/install-kubectl-3.png)
-We need to make binary kubctl executable
-![](img/install-kubectl-4.png)
-![](img/install-kubectl-5.png)
-And we need to move the kubctl binary to a file location in our system path
-![](img/install-kubectl-6.png)
-![](img/install-kubectl-7.png)
-  Video 8 - Kubernetes video Hello World
-<br>
-![](img/kubectl-pod-command-creation.png)
-![](img/kubectl-get-pods.png)
-![](img/kubectl-forwarding-1.png)
-- Let's open the browser
-![](img/kubectl-forwarding-2.png)
-now if we want to delete 
-![](img/kubectl-delete-pods.png)
-  Video 9 - Pods (Smallest unit)<br>
-  Video 11 - Services - never use port-forward(Only testing)
-          -instead use service . It has a stable ip address
-  Video 12 - Service Discovery
+for customer , fraud and notification 
+![](img/properties-sources.png)
 
-# 1 - Intellij k8s Plugin
-![](img/kubernetes-plugin.png)
-# 2 - Deploying Postgres, Rabbit and Zipkin
-- never deploy postgres on production inside a 
-kubernetes cluster
-# 3 - Postgres YAMLS
-![](img/postgres-yamls.png)
-# 4 Postgres Running in k8s
-inside minikube folder
-![](img/kubctl-apply-postgres.png)
-![](img/kubctl-apply-postgres-2.png)
-Let's investigate logs
-![](img/postgres-logs.png)
-We will create our databases (customer, fraud and notification) 
-![](img/psql.png)
-![](img/psql-inside-1.png)
-![](img/creating-databases.png)
-![](img/creating-databases-2.png)
-Conclusion : we have created databases that our microservices will need, but never do it in production , 
-only for testing;
+# 3 - Adding SPRING_PROFILES_ACTIVE=default
 
-# 5 Exercice
-# 6 Exercice solution
-Technically it's not the correct way to deploy them (rabbitmq an zipkin) to kubernetes
-if we are running in production;
-![](img/rabbit-zipkin-on-k8s.png)
-![](img/kubectl-apply-zipkin.png)
-![](img/kubectl-apply-zipkin-2.png)
-![](img/kubectl-apply-rabbitmq-1.png)
-![](img/kubectl-apply-rabbitmq-2.png)
-![](img/get-pods.png)
-Logs
-kubectl logs rabbitmq-0
-kubectl logs zipkin-0
-kubectl get all
-![](img/kubectl-get-all.png)
-Now we will launch some services
-- Rabbit MQ
-![](img/minikube-service-url-rabbitmq.png)
-Open browser and past in it http://127.0.0.1:56194 <br>
-user - guest and password - guest 
-- ![](img/rabbitmq-browser.png)
-- Zipkin
-![](img/minikube-service-url-zipkin.png)
- Open browser and past in it http://127.0.0.1:56194 <br>
-![](img/zipkin-browser.png)
-- Have a look - type is Loadbalancer and status is pending 
-![](img/kubectl-get-services.png)
-If we want to access our loadbalancer that we have within minikube, 
-just type minikube tunnel
-![](img/minikube-tunnel.png)
-- That give me to access my service on the specified ports 9411
-![](img/zipkin-not-pending.png)
-![](img/zipkin-not-pending-2.png)
+We open docker-compose.yml file and first we comment eureka ans api gateway parts
+![](img/docker-compose-yml-1.png)
+We also temporally comment in docker-compose.yml file customer , fraud and notification
+![](img/docker-compose-yml-2.png)
+
+We want just to start with docker-compose rabbitmq , zipkin pgadmin and postgres.
+Within the root let's just say<br>
+![](img/docker-compose-up.png)
+
+Now let's run from Idea customer , fraud and notification.
+It gives us an error , Nelson thinks that it's a bug and we have to sau in IntelliJ ,
+that we want default profile. 
+![](img/error-running-customer-idea.png)
+![](img/seting-up-env-var-default.png)
+For fraud and notification we do the same thing
+Now all three services are running from idea
+![](img/3-services-running.png)
+And pgAdmin with zipkin and RabbitMQ are also running from docker-compose.yml
+![](img/3-services-docker-compose-running.png)
+In local development we send request directly to customer with postman port 8080
+![](img/postman-customer.png)
+
+# 4 - Kube profile
+
+We also have to have profile with kube suffix or the similar file within customer,fraud and 
+notification
+![](img/application-kube-yml.png)
+
+# 5 - Building new Images and Testing Docker Compose
+
+The final thing that we have to do is to make sure that we can run our microservices with docker.
+Let's actually make sure that we can basically test things with Docker.
+For example if we have a new joiners in our team , then they can jus run a set of containers and 
+have the entire application stack working without no effort.
+Inside of client -> resources , we need to create clients-docker.properties
+![](img/clients-docker-properties.png)
+
+Let's open up the docker profile and uncomment customer , fraud and notification that we have 
+made before temporally and remove the section depends on eureka etc 
+Now let's test it out , open up the terminal , let's build a new image with 
+![](img/mvn-build-docker-image.png)
+![](img/mvn-build-docker-image-build-success.png)
+So we have new images, now we can pull those images with command <br>
+_docker compose pull_<br>
+Now we say docker compose up -d
+![](img/docker-compose-up 2.png)
+
+Now let's open up Postman and send directly request to customer which is on 8080
+![](img/postman-customer-2.png)
+Stop containers
+![](img/docker-compose-down.png)
