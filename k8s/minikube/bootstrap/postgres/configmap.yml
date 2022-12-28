@@ -5,4 +5,4 @@ metadata:
 data:
   POSTGRES_DB: lalik
   POSTGRES_USER: lalik
-  POSTGRES_PASSWORD: password
+  POSTGRES_PASSWORD: lalik
